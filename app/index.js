@@ -4,8 +4,11 @@ import { LinearGradient } from "expo-linear-gradient"
 import { StatusBar } from "expo-status-bar"
 import { wp, hp } from "../helpers/common"
 import { theme } from "../constants/theme"
+import { useRouter } from "expo-router"
 
 const WelcomeScreen = () => {
+    const router = useRouter()
+
     return (
         <View style={styles.container}>
             <StatusBar style="light" />
@@ -47,7 +50,10 @@ const WelcomeScreen = () => {
                         Every Pixel Tells A Story
                     </Animated.Text>
                     <Animated.View entering={FadeInDown.delay(800).springify()}>
-                        <Pressable style={styles.button}>
+                        <Pressable
+                            onPress={() => router.push("home")}
+                            style={styles.button}
+                        >
                             <Text style={styles.label}>Start Exploring</Text>
                         </Pressable>
                     </Animated.View>
