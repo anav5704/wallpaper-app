@@ -1,21 +1,25 @@
+import { View, Text, ScrollView, TextInput, Pressable, StyleSheet } from 'react-native'
 import { useSafeAreaInsets } from 'react-native-safe-area-context'
-import { Pressable, StyleSheet } from 'react-native'
+import { SimpleLineIcons, Feather } from '@expo/vector-icons';
+import Categories from '../../components/categories';
 import { theme } from '../../constants/theme';
-import { Feather } from '@expo/vector-icons';
-import { SimpleLineIcons } from '@expo/vector-icons';
-import { View, Text } from 'react-native'
 import { hp } from '../../helpers/common';
-import { ScrollView, TextInput } from 'react-native';
-import { useRef } from 'react';
+import { useRef, useState } from 'react';
 
 const HomeScreen = () => {
-    const { top } = useSafeAreaInsets()
+    const [search, setSearch] = useState("")
+    const [active, setActive] = useState(null)
     const searchRef = useRef()
+
+    const { top } = useSafeAreaInsets()
     const paddingTop = top > 0 ? top + 10 : 30
+
+    const handleSelect = (title) => {
+        setActive(title)
+    }
 
     return (
         <View style={[styles.container, { paddingTop }]}>
-
             {/* Header */}
             <View style={styles.header}>
                 <Pressable>
@@ -32,7 +36,7 @@ const HomeScreen = () => {
                 </Pressable>
             </View>
 
-            <ScrollView style={{ gap: 15 }}>
+            <ScrollView>
                 <View style={styles.search}>
                     {/* Search Bar */}
                     <TextInput
@@ -44,6 +48,14 @@ const HomeScreen = () => {
                         size={24}
                         name="search"
                         color={theme.colors.neutral(0.3)}
+                    />
+                </View>
+
+                {/* Categories */}
+                <View style={styles.Categories}>
+                    <Categories
+                        active={active}
+                        handleSelect={handleSelect}
                     />
                 </View>
             </ScrollView>
@@ -84,6 +96,10 @@ const styles = StyleSheet.create({
 
     searchInput: {
         fontSize: hp(1.5),
+    },
+
+    Categories: {
+        marginTop: 15
     }
 })
 
