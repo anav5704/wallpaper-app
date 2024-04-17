@@ -6,6 +6,7 @@ import { useEffect, useRef, useState } from 'react';
 import { theme } from '../../constants/theme';
 import { hp } from '../../helpers/common';
 import axios from 'axios';
+import ImageGrid from '../../components/image-grid';
 
 const HomeScreen = () => {
     const [active, setActive] = useState(null)
@@ -18,7 +19,7 @@ const HomeScreen = () => {
 
     const getImages = async (query) => {
         try {
-            const API_KEY = process.env.API_KEY 
+            const API_KEY = process.env.API_KEYa
             var URL = "https://pixabay.com/api/?key=" + API_KEY + "&q=" + encodeURIComponent(query)
 
             const response = await axios.get(URL)
@@ -84,6 +85,9 @@ const HomeScreen = () => {
                         handleSelect={handleSelect}
                     />
                 </View>
+                
+                {/* Images */}
+                <ImageGrid images={images} />
             </ScrollView>
         </View>
     )
