@@ -2,20 +2,46 @@ import { View, Text, ScrollView, TextInput, Pressable, StyleSheet } from 'react-
 import { useSafeAreaInsets } from 'react-native-safe-area-context'
 import { SimpleLineIcons, Feather } from '@expo/vector-icons';
 import Categories from '../../components/categories';
+import { useEffect, useRef, useState } from 'react';
 import { theme } from '../../constants/theme';
 import { hp } from '../../helpers/common';
-import { useRef, useState } from 'react';
+import axios from 'axios';
 
 const HomeScreen = () => {
-    const [search, setSearch] = useState("")
     const [active, setActive] = useState(null)
+    const [search, setSearch] = useState("")
+    const [images, setImages] = useState([])
     const searchRef = useRef()
 
     const { top } = useSafeAreaInsets()
     const paddingTop = top > 0 ? top + 10 : 30
 
-    const handleSelect = (title) => {
+    const getImages = async (query) => {
+        try {
+            const API_KEY = process.env.API_KEY 
+            var URL = "https://pixabay.com/api/?key=" + API_KEY + "&q=" + encodeURIComponent(query)
+
+            const response = await axios.get(URL)
+            const { data } = response
+
+            return data
+        }
+        catch (error) {
+            console.log("Get images error:", error)
+        }
+    }
+
+    useEffect(() => {
+        (async () => {
+            const data = await getImages()
+            setImages((prev) => [...prev, ...data.hits])
+        })()
+    }, [])
+
+    const handleSelect = async (title) => {
         setActive(title)
+        const data = await getImages()
+        setImages((prev) => [...prev, ...data.hits])
     }
 
     return (
