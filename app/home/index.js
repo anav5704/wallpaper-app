@@ -6,6 +6,7 @@ import Categories from '../../components/categories';
 import ImageGrid from '../../components/image-grid';
 import { theme } from '../../constants/theme';
 import { hp } from '../../helpers/common';
+import { useRouter } from 'expo-router';
 import { debounce } from 'lodash';
 import axios from 'axios';
 
@@ -15,6 +16,7 @@ const HomeScreen = () => {
     const [search, setSearch] = useState("")
     const [images, setImages] = useState([])
     const [page, setPage] = useState(1)
+    const router = useRouter()
     const scrollRef = useRef()
 
     const { top } = useSafeAreaInsets()
@@ -22,7 +24,7 @@ const HomeScreen = () => {
 
     const getImages = async (query, page = 1) => {
         try {
-            const API_KEY = process.env.API_KEY 
+            const API_KEY = process.env.API_KEY
             var URL = "https://pixabay.com/api/?key=" + API_KEY + "&page=" + page + "&q=" + encodeURIComponent(query)
 
             const response = await axios.get(URL)
@@ -54,7 +56,7 @@ const HomeScreen = () => {
         setSearch(search)
 
         if (search.length > 2) {
-           setPage(1) 
+            setPage(1)
             setImages([])
 
             const data = await getImages(search)
@@ -62,7 +64,7 @@ const HomeScreen = () => {
         }
 
         if (search == "") {
-           setPage(1) 
+            setPage(1)
             setImages([])
 
             const data = await getImages()
@@ -144,7 +146,10 @@ const HomeScreen = () => {
                 </View>
 
                 {/* Images */}
-                <ImageGrid images={images} />
+                <ImageGrid
+                    images={images}
+                    router={router}
+                />
             </ScrollView>
         </View>
     )

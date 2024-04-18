@@ -4,7 +4,7 @@ import { wp } from "../helpers/common"
 import { Image } from "expo-image"
 import { theme } from '../constants/theme';
 
-const ImageGrid = ({ images }) => {
+const ImageGrid = ({ images, router }) => {
     return (
         <View style={styles.container}>
             <MasonryFlashList
@@ -13,13 +13,19 @@ const ImageGrid = ({ images }) => {
                 estimatedItemSize={200}
                 initialNumToRender={100}
                 contentContainerStyle={styles.content}
-                renderItem={({ item, index }) => <ImageCard image={item} index={index} />}
+                renderItem={({ item, index }) =>
+                    <ImageCard
+                        image={item}
+                        index={index}
+                        router={router}
+                    />
+                }
             />
         </View>
     )
 }
 
-const ImageCard = ({ image, index }) => {
+const ImageCard = ({ image, index, router }) => {
     const getImageHeight = () => {
         let { imageHeight: height, imageWidth: width } = image
 
@@ -35,7 +41,10 @@ const ImageCard = ({ image, index }) => {
     }
 
     return (
-        <Pressable style={[styles.imageWrapper, index % 2 == 0 ? styles.spacingRight : styles.spacingLeft]}>
+        <Pressable
+            onPress={() => router.push({ pathname: "home/image", params: { ...image }})}
+            style={[styles.imageWrapper, index % 2 == 0 ? styles.spacingRight : styles.spacingLeft]}
+        >
             <Image
                 transition={100}
                 style={[styles.image, getImageHeight()]}
