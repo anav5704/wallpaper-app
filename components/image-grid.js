@@ -56,7 +56,7 @@ const styles = StyleSheet.create({
     },
 
     imageWrapper: {
-        borderStartColor: theme.colors.gray,
+        backgroundColor: theme.colors.gray,
         borderRadius: theme.radius.xl,
         borderCurve: "continuous",
         overflow: "hidden",

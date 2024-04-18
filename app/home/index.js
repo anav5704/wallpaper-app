@@ -1,28 +1,29 @@
 import { View, Text, ScrollView, TextInput, Pressable, StyleSheet } from 'react-native'
 import { useSafeAreaInsets } from 'react-native-safe-area-context'
+import { useCallback, useEffect, useRef, useState } from 'react';
 import { SimpleLineIcons, Feather } from '@expo/vector-icons';
 import Categories from '../../components/categories';
-import { useCallback, useEffect, useRef, useState } from 'react';
+import ImageGrid from '../../components/image-grid';
 import { theme } from '../../constants/theme';
 import { hp } from '../../helpers/common';
-import axios from 'axios';
-import ImageGrid from '../../components/image-grid';
 import { debounce } from 'lodash';
+import axios from 'axios';
 
 const HomeScreen = () => {
+    const [atBottom, setAtBottom] = useState(false)
     const [active, setActive] = useState(null)
     const [search, setSearch] = useState("")
     const [images, setImages] = useState([])
     const [page, setPage] = useState(1)
-    const searchRef = useRef()
+    const scrollRef = useRef()
 
     const { top } = useSafeAreaInsets()
     const paddingTop = top > 0 ? top + 10 : 30
 
-    const getImages = async (query) => {
+    const getImages = async (query, page = 1) => {
         try {
-            const API_KEY = process.env.API_KEY
-            var URL = "https://pixabay.com/api/?key=" + API_KEY + "&q=" + encodeURIComponent(query)
+            const API_KEY = process.env.API_KEY 
+            var URL = "https://pixabay.com/api/?key=" + API_KEY + "&page=" + page + "&q=" + encodeURIComponent(query)
 
             const response = await axios.get(URL)
             const { data } = response
@@ -53,7 +54,7 @@ const HomeScreen = () => {
         setSearch(search)
 
         if (search.length > 2) {
-            setPage(1)
+           setPage(1) 
             setImages([])
 
             const data = await getImages(search)
@@ -61,7 +62,7 @@ const HomeScreen = () => {
         }
 
         if (search == "") {
-            setPage(1)
+           setPage(1) 
             setImages([])
 
             const data = await getImages()
@@ -71,11 +72,37 @@ const HomeScreen = () => {
 
     const textDebounce = useCallback(debounce(handleSearch, 500), [])
 
+    const handlePress = () => {
+        scrollRef.current.scrollTo({
+            y: 0,
+            animated: true
+        })
+    }
+
+    const handleScroll = async (e) => {
+        const contentHeight = e.nativeEvent.contentSize.height
+        const scrollViewHeight = e.nativeEvent.layoutMeasurement.height
+        const scrollOffset = e.nativeEvent.contentOffset.y
+
+        const bottomPosition = contentHeight - scrollViewHeight
+
+        if (scrollOffset >= bottomPosition - 1 && !atBottom) {
+            setPage(page + 1)
+            setAtBottom(true)
+
+            const data = await getImages(search ? search : active ? active : null, page)
+            setImages((prev) => [...prev, ...data.hits])
+        }
+        else if (atBottom) {
+            setAtBottom(false)
+        }
+    }
+
     return (
         <View style={[styles.container, { paddingTop }]}>
             {/* Header */}
             <View style={styles.header}>
-                <Pressable>
+                <Pressable onPress={handlePress}>
                     <Text style={styles.title}>
                         Pixels
                     </Text>
@@ -89,14 +116,17 @@ const HomeScreen = () => {
                 </Pressable>
             </View>
 
-            <ScrollView>
+            <ScrollView
+                onScroll={handleScroll}
+                scrollEventThrottle={5}
+                ref={scrollRef}
+            >
                 <View style={styles.search}>
                     {/* Search Bar */}
                     <TextInput
                         placeholder='Search Wallpaper'
                         onChangeText={textDebounce}
                         style={styles.searchInput}
-                        ref={searchRef}
                     />
                     <Feather
                         size={24}
